@@ -43,6 +43,7 @@ const contact = async (req, res) => {
       .json({ success: true, message: "Message sent successfully!" });
   } catch (error) {
     console.error("Error sending email:", error);
+    console.log(error);
     return res
       .status(500)
       .json({ success: false, error: "Failed to send message." });
