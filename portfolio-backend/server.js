@@ -6,7 +6,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import morgan from "morgan";
 import { PORT, CLIENT_URL, NODE_ENV } from "./config/config.js";
-import contactRoutes from "./routes/contact-routes.js";
+import contactRoutes from "./routes/contactRoutes.js";
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
