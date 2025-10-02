@@ -37,7 +37,7 @@ app.options("*", cors({ origin: allowedOrigins, credentials: true }));
 app.use(helmet());
 app.use(morgan("dev"));
 app.use(express.json());
-
+app.set("trust proxy", 1); // 1 means trust first proxy
 // ----------------------
 // Rate limiter (on /contact)
 // ----------------------
