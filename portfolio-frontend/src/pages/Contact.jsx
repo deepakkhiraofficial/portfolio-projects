@@ -66,6 +66,7 @@ const Contact = () => {
       toast.error(
         error?.response?.data?.error || error.message || "Server error. Try again later."
       );
+      console.log(error);
     } finally {
       setLoading(false);
     }
