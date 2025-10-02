@@ -45,7 +45,7 @@ const Contact = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (loading) return; // prevent multiple clicks
+    if (loading) return;
 
     const { name, email, message } = formData;
     const emailRegex = /^\S+@\S+\.\S+$/;
@@ -63,62 +63,57 @@ const Contact = () => {
     setLoading(true);
 
     try {
+      // ✅ simple backend endpoint (no redis/queue, direct email send)
       const res = await axios.post(
         "https://deepakkhiraofficial.onrender.com/contact",
         { name, email, message },
         { headers: { "Content-Type": "application/json" } }
       );
 
-      toast.success(res?.data?.message || "Message sent successfully!", { autoClose: 3000 });
+      toast.success(res?.data?.message || "Message sent successfully!", {
+        autoClose: 3000,
+      });
       setFormData({ name: "", email: "", message: "" });
-      document.getElementById("name").focus(); // focus on first input
+      document.getElementById("name").focus();
     } catch (error) {
       const errorMessage =
-        error?.response?.data?.error || error.message || "Server error. Try again later.";
+        error?.response?.data?.error ||
+        "Failed to send message. Please try again later.";
       toast.error(errorMessage, { autoClose: 5000 });
-      console.error(error);
+      console.error("Contact form error:", error);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <section
-      id="contact"
-      className="py-16 px-4 bg-gray-50"
-      aria-labelledby="contact-heading"
-    >
+    <section id="contact" className="py-16 px-4 bg-gray-50">
       <div className="max-w-4xl mx-auto">
-        <h2
-          id="contact-heading"
-          className="text-3xl md:text-4xl font-bold text-gray-800 mb-12 text-center"
-        >
+        <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-12 text-center">
           Get In Touch
         </h2>
 
+        {/* Contact Details + Social Links */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-          {/* Contact Details */}
-          <aside className="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition">
+          <aside className="bg-white p-8 rounded-xl shadow-md">
             <h3 className="text-2xl font-semibold text-blue-600 mb-6">
               Contact Details
             </h3>
             <ul className="space-y-4">
               <li className="flex items-center gap-4">
-                <FaEnvelope className="text-blue-500 text-xl" aria-hidden="true" />
+                <FaEnvelope className="text-blue-500 text-xl" />
                 <a
                   href="mailto:deepakkushwah475110@gmail.com"
                   className="text-gray-700 hover:text-blue-600 transition"
-                  aria-label="Send email to Deepak Kushwah"
                 >
                   deepakkushwah475110@gmail.com
                 </a>
               </li>
               <li className="flex items-center gap-4">
-                <FaPhoneAlt className="text-blue-500 text-xl" aria-hidden="true" />
+                <FaPhoneAlt className="text-blue-500 text-xl" />
                 <a
                   href="tel:+919109001109"
                   className="text-gray-700 hover:text-blue-600 transition"
-                  aria-label="Call Deepak Kushwah"
                 >
                   +91 9109001109
                 </a>
@@ -126,44 +121,35 @@ const Contact = () => {
             </ul>
           </aside>
 
-          {/* Social Links */}
-          <aside className="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition">
+          <aside className="bg-white p-8 rounded-xl shadow-md">
             <h3 className="text-2xl font-semibold text-blue-600 mb-6">
               Connect With Me
             </h3>
-            <nav aria-label="Social media links">
-              <ul className="flex flex-wrap gap-4">
-                {socialLinks.map(({ name, url, icon }) => (
-                  <li key={name}>
-                    <a
-                      href={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-800 rounded-full hover:bg-blue-100 hover:text-blue-600 transition"
-                      aria-label={`Visit Deepak Kushwah's ${name} profile`}
-                    >
-                      <span className="text-lg">{icon}</span>
-                      <span>{name}</span>
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </nav>
+            <ul className="flex flex-wrap gap-4">
+              {socialLinks.map(({ name, url, icon }) => (
+                <li key={name}>
+                  <a
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-800 rounded-full hover:bg-blue-100 hover:text-blue-600 transition"
+                  >
+                    <span className="text-lg">{icon}</span>
+                    <span>{name}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
           </aside>
         </div>
 
         {/* Contact Form */}
         <div className="bg-white p-8 rounded-xl shadow-md max-w-3xl mx-auto">
-          <ToastContainer autoClose={3000} toastProps={{ "aria-live": "polite", role: "status" }} />
+          <ToastContainer autoClose={3000} />
           <h3 className="text-2xl font-semibold text-blue-600 mb-6">
             Send Me a Message
           </h3>
-          <form
-            onSubmit={handleSubmit}
-            className="space-y-6"
-            aria-label="Contact form"
-            noValidate
-          >
+          <form onSubmit={handleSubmit} className="space-y-6" noValidate>
             <div>
               <label htmlFor="name" className="block text-gray-700 mb-2 font-medium">
                 Name
@@ -171,14 +157,11 @@ const Contact = () => {
               <input
                 type="text"
                 id="name"
-                name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 placeholder="Your Name"
                 required
-                autoComplete="name"
-                aria-required="true"
               />
             </div>
 
@@ -189,14 +172,11 @@ const Contact = () => {
               <input
                 type="email"
                 id="email"
-                name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 placeholder="Your Email"
                 required
-                autoComplete="email"
-                aria-required="true"
               />
             </div>
 
@@ -206,23 +186,21 @@ const Contact = () => {
               </label>
               <textarea
                 id="message"
-                name="message"
                 rows="4"
                 value={formData.message}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 placeholder="Your Message"
                 required
-                aria-required="true"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              aria-busy={loading}
-              aria-disabled={loading}
-              className={`w-full py-3 rounded-lg text-white font-semibold transition ${loading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+              className={`w-full py-3 rounded-lg text-white font-semibold transition ${loading
+                  ? "bg-blue-400 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700"
                 }`}
             >
               {loading ? "Sending..." : "Send Message"}
@@ -235,4 +213,3 @@ const Contact = () => {
 };
 
 export default Contact;
-// This file defines the Contact page component with a form and social links.
