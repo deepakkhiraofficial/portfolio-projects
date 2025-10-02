@@ -45,14 +45,23 @@ const Contact = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return; // prevent multiple clicks
+
     const { name, email, message } = formData;
+    const emailRegex = /^\S+@\S+\.\S+$/;
 
     if (!name.trim() || !email.trim() || !message.trim()) {
       toast.error("Please fill in all the fields.");
       return;
     }
 
+    if (!emailRegex.test(email)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+
     setLoading(true);
+
     try {
       const res = await axios.post(
         "https://deepakkhiraofficial.onrender.com/contact",
@@ -60,13 +69,14 @@ const Contact = () => {
         { headers: { "Content-Type": "application/json" } }
       );
 
-      toast.success(res?.data?.message || "Message sent successfully!");
+      toast.success(res?.data?.message || "Message sent successfully!", { autoClose: 3000 });
       setFormData({ name: "", email: "", message: "" });
+      document.getElementById("name").focus(); // focus on first input
     } catch (error) {
-      toast.error(
-        error?.response?.data?.error || error.message || "Server error. Try again later."
-      );
-      console.log(error);
+      const errorMessage =
+        error?.response?.data?.error || error.message || "Server error. Try again later.";
+      toast.error(errorMessage, { autoClose: 5000 });
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -87,6 +97,7 @@ const Contact = () => {
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+          {/* Contact Details */}
           <aside className="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition">
             <h3 className="text-2xl font-semibold text-blue-600 mb-6">
               Contact Details
@@ -115,6 +126,7 @@ const Contact = () => {
             </ul>
           </aside>
 
+          {/* Social Links */}
           <aside className="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition">
             <h3 className="text-2xl font-semibold text-blue-600 mb-6">
               Connect With Me
@@ -140,8 +152,9 @@ const Contact = () => {
           </aside>
         </div>
 
+        {/* Contact Form */}
         <div className="bg-white p-8 rounded-xl shadow-md max-w-3xl mx-auto">
-          <ToastContainer autoClose={1500} toastProps={{ "aria-live": "polite" }} />
+          <ToastContainer autoClose={3000} toastProps={{ "aria-live": "polite", role: "status" }} />
           <h3 className="text-2xl font-semibold text-blue-600 mb-6">
             Send Me a Message
           </h3>
@@ -222,3 +235,4 @@ const Contact = () => {
 };
 
 export default Contact;
+// This file defines the Contact page component with a form and social links.
