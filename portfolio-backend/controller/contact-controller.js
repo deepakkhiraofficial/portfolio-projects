@@ -1,24 +1,18 @@
-import nodemailer from "nodemailer";
+import emailQueue from "../queues/emailQueue.js";
+import { validationResult } from "express-validator";
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
-
-const emailRegex = /^\S+@\S+\.\S+$/;
-
+// Contact controller
 const contact = async (req, res) => {
   const { name, email, message } = req.body;
 
+  // Basic validation
   if (!name || !email || !message) {
     return res
       .status(400)
       .json({ success: false, error: "All fields are required." });
   }
 
+  const emailRegex = /^\S+@\S+\.\S+$/;
   if (!emailRegex.test(email)) {
     return res
       .status(400)
@@ -26,27 +20,19 @@ const contact = async (req, res) => {
   }
 
   try {
-    const mailOptions = {
-      from: `"Portfolio Contact" <${process.env.EMAIL_USER}>`,
-      replyTo: email,
-      to: process.env.EMAIL_USER,
-      subject: `New message from ${name}`,
-      text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
-      // html: `<p><strong>Name:</strong> ${name}</p><p><strong>Email:</strong> ${email}</p><p><strong>Message:</strong><br/>${message}</p>`,
-    };
+    // Add email job to queue (async)
+    await emailQueue.add({ name, email, message });
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log("Email sent: ", info.messageId);
-
-    return res
-      .status(200)
-      .json({ success: true, message: "Message sent successfully!" });
+    // Immediate response to user
+    return res.status(200).json({
+      success: true,
+      message: "Message received! Email will be sent shortly.",
+    });
   } catch (error) {
-    console.error("Error sending email:", error);
-    console.log(error);
+    console.error("Queue error:", error);
     return res
       .status(500)
-      .json({ success: false, error: "Failed to send message." });
+      .json({ success: false, error: "Failed to process request." });
   }
 };
 

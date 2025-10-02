@@ -1,32 +1,24 @@
 {
-  "_ReactToastify-CSKArPOx.js": {
-    "file": "assets/ReactToastify-CSKArPOx.js",
-    "name": "ReactToastify",
+  "_index-BMOyA7t7.js": {
+    "file": "assets/index-BMOyA7t7.js",
+    "name": "index",
     "imports": [
       "index.html"
-    ],
-    "css": [
-      "assets/ReactToastify-GNLSjkBZ.css"
     ]
   },
-  "_ReactToastify-GNLSjkBZ.css": {
-    "file": "assets/ReactToastify-GNLSjkBZ.css",
-    "src": "_ReactToastify-GNLSjkBZ.css"
-  },
-  "_react-BP0qhIbX.js": {
-    "file": "assets/react-BP0qhIbX.js",
+  "_react-DomL0yj5.js": {
+    "file": "assets/react-DomL0yj5.js",
     "name": "react"
   },
   "index.html": {
-    "file": "assets/index-CDnekmL5.js",
+    "file": "assets/index-BwsLh_RN.js",
     "name": "index",
     "src": "index.html",
     "isEntry": true,
     "imports": [
-      "_react-BP0qhIbX.js"
+      "_react-DomL0yj5.js"
     ],
     "dynamicImports": [
-      "src/pages/Home.jsx",
       "src/pages/About.jsx",
       "src/pages/Projects.jsx",
       "src/components/SkillBadge.jsx",
@@ -34,73 +26,62 @@
       "src/pages/Achievements.jsx"
     ],
     "css": [
-      "assets/index-Byh4cFFK.css"
+      "assets/index-BP8de0AD.css"
     ]
   },
-  "src/assets/Deepak_Kushwah_ Resume.pdf": {
-    "file": "assets/Deepak_Kushwah_ Resume-zDYNh9K0.pdf",
-    "src": "src/assets/Deepak_Kushwah_ Resume.pdf"
-  },
   "src/components/SkillBadge.jsx": {
-    "file": "assets/SkillBadge-DjUV1inm.js",
+    "file": "assets/SkillBadge-Dlh2y4DA.js",
     "name": "SkillBadge",
     "src": "src/components/SkillBadge.jsx",
     "isDynamicEntry": true,
     "imports": [
       "index.html",
-      "_ReactToastify-CSKArPOx.js",
-      "_react-BP0qhIbX.js"
+      "_index-BMOyA7t7.js",
+      "_react-DomL0yj5.js"
     ]
   },
   "src/pages/About.jsx": {
-    "file": "assets/About-CH60VCtX.js",
+    "file": "assets/About-l73UQMqd.js",
     "name": "About",
     "src": "src/pages/About.jsx",
     "isDynamicEntry": true,
     "imports": [
       "index.html",
-      "_react-BP0qhIbX.js"
+      "_react-DomL0yj5.js"
     ]
   },
   "src/pages/Achievements.jsx": {
-    "file": "assets/Achievements-DkDepg8K.js",
+    "file": "assets/Achievements-PWU7zzdZ.js",
     "name": "Achievements",
     "src": "src/pages/Achievements.jsx",
     "isDynamicEntry": true,
     "imports": [
       "index.html",
-      "_react-BP0qhIbX.js"
+      "_react-DomL0yj5.js"
     ]
   },
   "src/pages/Contact.jsx": {
-    "file": "assets/Contact-DrrdI_9f.js",
+    "file": "assets/Contact-BInjr1Ig.js",
     "name": "Contact",
     "src": "src/pages/Contact.jsx",
     "isDynamicEntry": true,
     "imports": [
       "index.html",
-      "_ReactToastify-CSKArPOx.js",
-      "_react-BP0qhIbX.js"
-    ]
-  },
-  "src/pages/Home.jsx": {
-    "file": "assets/Home-BkbjuElf.js",
-    "name": "Home",
-    "src": "src/pages/Home.jsx",
-    "isDynamicEntry": true,
-    "imports": [
-      "index.html",
-      "_react-BP0qhIbX.js"
+      "_index-BMOyA7t7.js",
+      "_react-DomL0yj5.js"
+    ],
+    "css": [
+      "assets/Contact-GNLSjkBZ.css"
     ]
   },
   "src/pages/Projects.jsx": {
-    "file": "assets/Projects-Al67EQx9.js",
+    "file": "assets/Projects-BsSmwoyk.js",
     "name": "Projects",
     "src": "src/pages/Projects.jsx",
     "isDynamicEntry": true,
     "imports": [
       "index.html",
-      "_react-BP0qhIbX.js"
+      "_react-DomL0yj5.js"
     ]
   }
 }

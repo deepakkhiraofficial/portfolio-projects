@@ -1,10 +1,34 @@
-import express from "express";  
+import express from "express";
+import emailQueue from "../queues/emailQueue.js";
+
 const router = express.Router();
-import contact from "../controller/contact-controller.js";
 
-// POST route for contact form submission
-router.post("/", contact);
+router.post("/", async (req, res) => {
+  const { name, email, message } = req.body;
 
-// Export the router
+  if (!name || !email || !message)
+    return res
+      .status(400)
+      .json({ success: false, error: "All fields are required." });
+
+  const emailRegex = /^\S+@\S+\.\S+$/;
+  if (!emailRegex.test(email))
+    return res
+      .status(400)
+      .json({ success: false, error: "Invalid email address." });
+
+  try {
+    await emailQueue.add({ name, email, message });
+    return res.status(200).json({
+      success: true,
+      message: "Message received! Email will be sent shortly.",
+    });
+  } catch (err) {
+    console.error("Queue error:", err);
+    return res
+      .status(500)
+      .json({ success: false, error: "Failed to process request." });
+  }
+});
+
 export default router;
-// This file defines the contact routes for handling form submissions.
