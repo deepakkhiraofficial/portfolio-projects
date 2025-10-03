@@ -8,11 +8,11 @@
   "type": "module",
   "main": "server.js",
   "scripts": {
-  "dev": "nodemon server.js",
-  "start": "node server.js",
-  "start:prod": "pm2 start server.js --name portfolio-backend",
-  "build-frontend": "cd ../portfolio-frontend && npm run build && cp -r build ../portfolio-backend/dist"
-},
+    "dev": "nodemon server.js",
+    "start": "node server.js",
+    "start:prod": "pm2 start server.js --name portfolio-backend",
+    "build": "cd ../portfolio-frontend && npm run build && copyfiles -u 1 ../portfolio-frontend/build/**/* ../portfolio-backend/dist"
+  },
   "dependencies": {
     "bull": "^4.16.5",
     "cors": "^2.8.5",

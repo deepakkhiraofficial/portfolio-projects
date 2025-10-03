@@ -7,7 +7,7 @@ import { fileURLToPath } from "url";
 import morgan from "morgan";
 import { PORT, CLIENT_URL } from "./config/config.js";
 import contactRoutes from "./routes/contactRoutes.js";
-
+console.log("CLIENT_URL:", CLIENT_URL);
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -16,7 +16,7 @@ const DIST_PATH = path.join(__dirname, "dist");
 // ----------------------
 // CORS
 // ----------------------
-const allowedOrigins = [CLIENT_URL, "http://localhost:3000"];
+const allowedOrigins = [CLIENT_URL, "http://localhost:3000","*"];
 
 app.use(
   cors({
