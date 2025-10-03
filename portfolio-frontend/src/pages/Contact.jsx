@@ -67,15 +67,15 @@ const Contact = () => {
       const res = await axios.post(
         "https://deepakkhiraofficial.onrender.com/contact",
         { name, email, message},
-        { headers: { "Content-Type": "application/json" } ,
-          withCredentials: true,
-          timeout: 30000 // 10 seconds timeout
+        {
+          timeout: 10000 // 10 seconds timeout
         }
       );
-        console.log(res.data)
+        console.log(res.data);
       toast.success(res?.data?.message || "Message sent successfully!", {
         autoClose: 3000,
       });
+      // setFormData({ name: "", email: "", message: "" });  
       setFormData({ name: "", email: "", message: "" });
       document.getElementById("name").focus();
     } catch (error) {
