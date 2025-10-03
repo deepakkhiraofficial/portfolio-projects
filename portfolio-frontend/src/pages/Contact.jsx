@@ -66,8 +66,11 @@ const Contact = () => {
       // ✅ simple backend endpoint (no redis/queue, direct email send)
       const res = await axios.post(
         "https://deepakkhiraofficial.onrender.com/contact",
-        { name, email, message },
-        { headers: { "Content-Type": "application/json" } }
+        { name, email, message},
+        { headers: { "Content-Type": "application/json" } ,
+          withCredentials: true,
+          timeout: 10000 // 10 seconds timeout
+        }
       );
 
       toast.success(res?.data?.message || "Message sent successfully!", {
