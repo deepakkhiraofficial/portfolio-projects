@@ -69,7 +69,7 @@ const Contact = () => {
         { name, email, message},
         { headers: { "Content-Type": "application/json" } ,
           withCredentials: true,
-          timeout: 10000 // 10 seconds timeout
+          timeout: 30000 // 10 seconds timeout
         }
       );
         console.log(res.data)
