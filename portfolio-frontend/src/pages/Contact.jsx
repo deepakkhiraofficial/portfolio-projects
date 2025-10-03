@@ -72,7 +72,7 @@ const Contact = () => {
           timeout: 10000 // 10 seconds timeout
         }
       );
-
+        console.log(res.data)
       toast.success(res?.data?.message || "Message sent successfully!", {
         autoClose: 3000,
       });
