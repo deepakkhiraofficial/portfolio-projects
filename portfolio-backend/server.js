@@ -26,38 +26,35 @@ app.set("trust proxy", 1);
 // ----------------------
 const allowedOrigins =
   NODE_ENV === "production"
-    ? [CLIENT_URL] // ✅ Only your deployed frontend in prod
-    : ["http://localhost:3000", CLIENT_URL]; // ✅ Dev mode: allow localhost + your client
+    ? [CLIENT_URL]
+    : ["http://localhost:3000", CLIENT_URL];
 
 app.use(
   cors({
     origin: (origin, cb) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        cb(null, true);
-      } else {
-        cb(new Error(`CORS policy: ${origin} not allowed`));
-      }
+      if (!origin || allowedOrigins.includes(origin)) cb(null, true);
+      else cb(new Error(`CORS policy: ${origin} not allowed`));
     },
     credentials: true,
   })
 );
 
 // ----------------------
-// Rate limiter (only for /contact)
+// Rate limiter
 // ----------------------
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 15 * 60 * 1000,
   max: 100,
   standardHeaders: true,
   legacyHeaders: false,
-  message: "Too many requests from this IP, please try again later.",
+  message: "Too many requests. Try again later.",
 });
-app.use("/contact", limiter);
+app.use("/api", limiter);
 
 // ----------------------
-// API routes
+// Routes
 // ----------------------
-app.use("/contact", contactRoutes);
+app.use("/api", contactRoutes);
 
 // ----------------------
 // Serve frontend build
@@ -71,7 +68,7 @@ app.get("*", (req, res) => {
 // Error handler
 // ----------------------
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error("❌", err.stack);
   res
     .status(err.status || 500)
     .json({ success: false, error: err.message || "Something went wrong!" });
