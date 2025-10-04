@@ -51,7 +51,7 @@ const Contact = () => {
     const emailRegex = /^\S+@\S+\.\S+$/;
 
     if (!name.trim() || !email.trim() || !message.trim()) {
-      toast.error("Please fill in all the fields.");
+      toast.error("Please fill in all fields.");
       return;
     }
 
@@ -63,27 +63,32 @@ const Contact = () => {
     setLoading(true);
 
     try {
-      // ✅ simple backend endpoint (no redis/queue, direct email send)
       const res = await axios.post(
-        "https://deepakkhiraofficial.onrender.com/contact",
-        { name, email, message},
+        "https://deepakkhiraofficial.onrender.com/api/contact",
+        { name, email, message },
         {
-          timeout: 10000 // 10 seconds timeout
+          headers: {
+            "Content-Type": "application/json",
+          },
+          timeout: 10000,
         }
       );
-        console.log(res.data);
+
+      console.log("✅ Contact Response:", res.data);
       toast.success(res?.data?.message || "Message sent successfully!", {
         autoClose: 3000,
       });
-      // setFormData({ name: "", email: "", message: "" });  
-      setFormData({ name: "", email: "", message: "" });
-      document.getElementById("name").focus();
+
+      // Reset form after 1 sec for smoother UX
+      setTimeout(() => {
+        setFormData({ name: "", email: "", message: "" });
+      }, 1000);
     } catch (error) {
+      console.error("❌ Contact form error:", error);
       const errorMessage =
         error?.response?.data?.error ||
         "Failed to send message. Please try again later.";
-      toast.error(errorMessage, { autoClose: 5000 });
-      console.error("Contact form error:", error);
+      toast.error(errorMessage, { autoClose: 4000 });
     } finally {
       setLoading(false);
     }
@@ -96,7 +101,7 @@ const Contact = () => {
           Get In Touch
         </h2>
 
-        {/* Contact Details + Social Links */}
+        {/* Contact Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           <aside className="bg-white p-8 rounded-xl shadow-md">
             <h3 className="text-2xl font-semibold text-blue-600 mb-6">
@@ -124,6 +129,7 @@ const Contact = () => {
             </ul>
           </aside>
 
+          {/* Social Links */}
           <aside className="bg-white p-8 rounded-xl shadow-md">
             <h3 className="text-2xl font-semibold text-blue-600 mb-6">
               Connect With Me
@@ -152,6 +158,7 @@ const Contact = () => {
           <h3 className="text-2xl font-semibold text-blue-600 mb-6">
             Send Me a Message
           </h3>
+
           <form onSubmit={handleSubmit} className="space-y-6" noValidate>
             <div>
               <label htmlFor="name" className="block text-gray-700 mb-2 font-medium">
