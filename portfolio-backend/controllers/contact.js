@@ -1,34 +1,35 @@
 import nodemailer from "nodemailer";
 import { EMAIL_USER, EMAIL_PASS } from "../config/config.js";
 
-// Async email sending function
 const sendEmail = async ({ name, email, message }) => {
   try {
+    // ✅ Correct Gmail SMTP configuration
     const transporter = nodemailer.createTransport({
-      host: "gmail",
+      service: "gmail", // use Gmail’s predefined service
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: EMAIL_USER,
+        pass: EMAIL_PASS,
       },
     });
 
+    // ✅ Optional: verify SMTP connection
     transporter.verify((err, success) => {
-      if (err) console.error("SMTP Connection Error:", err);
-      else console.log("✅ Server is ready to take messages");
+      if (err) console.error("❌ SMTP Connection Error:", err);
+      else console.log("✅ SMTP Server is ready to send emails");
     });
 
     const mailOptions = {
-      from: `"${name}" <${process.env.EMAIL_USER}>`,
-      to: process.env.EMAIL_USER,
+      from: `"${name}" <${EMAIL_USER}>`,
+      to: EMAIL_USER, // send to yourself
       replyTo: email,
       subject: `📩 New Contact Form Submission from ${name}`,
       text: `Name: ${name}\nEmail: ${email}\nMessage:\n${message}`,
     };
 
-   const info = await transporter.sendMail(mailOptions);
-   console.log("✅ Email sent successfully:", info.response);
+    const info = await transporter.sendMail(mailOptions);
+    console.log("✅ Email sent successfully:", info.response);
   } catch (error) {
-    console.error("❌ Email send error:", error);
+    console.error("❌ Email send error:", error.message);
     throw error;
   }
 };
@@ -48,7 +49,7 @@ const contact = async (req, res) => {
       .status(400)
       .json({ success: false, error: "Invalid email address." });
 
-  // ✅ Send immediate response
+  // ✅ Immediate response (non-blocking)
   res.status(200).json({
     success: true,
     message: "Message received! We'll contact you soon.",
@@ -61,4 +62,3 @@ const contact = async (req, res) => {
 };
 
 export default contact;
-
