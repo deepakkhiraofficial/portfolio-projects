@@ -85,7 +85,7 @@ app.get("/api/health", (_, res) => {
 });
 
 // ✅ FIX: Use full `/api/contact` prefix
-app.use("/api/contact", contactRoutes);
+app.use("/api", contactRoutes);
 
 // --------------------------------------------------
 // ⚙️ Frontend Build (for Render deployment)
