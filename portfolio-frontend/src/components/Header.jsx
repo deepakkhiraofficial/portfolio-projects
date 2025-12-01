@@ -12,6 +12,7 @@ const Header = () => {
         { path: "about", label: "About" },
         { path: "projects", label: "Projects" },
         { path: "skills", label: "Skills" },
+        { path: "studymaterial", label: "Study Material" },
         {
             path: "achievements",
             label: "Achievements",

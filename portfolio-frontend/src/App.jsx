@@ -12,6 +12,7 @@ const Projects = lazy(() => import("./pages/Projects"));
 const Skills = lazy(() => import("./components/SkillBadge"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Achievements = lazy(() => import("./pages/Achievements"));
+const StudyMaterial = lazy(() => import("./pages/StudyMaterial"));
 
 // Optional: Skeleton or spinner fallback for better UX
 const LoadingFallback = () => (
@@ -35,6 +36,7 @@ const App = () => {
                 <Route path="/skills" element={<Skills />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/achievements" element={<Achievements />} />
+                <Route path="/studymaterial" element={<StudyMaterial />} />
               </Routes>
             </Suspense>
           </main>
