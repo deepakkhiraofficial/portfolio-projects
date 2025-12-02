@@ -12,31 +12,16 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 
 const socialLinks = [
-  {
-    name: "LinkedIn",
-    url: "https://www.linkedin.com/in/deepakkhiraofficial",
-    icon: <FaLinkedin aria-hidden="true" />,
-  },
-  {
-    name: "GitHub",
-    url: "https://github.com/deepakkhiraofficial",
-    icon: <FaGithub aria-hidden="true" />,
-  },
-  {
-    name: "Facebook",
-    url: "https://www.facebook.com/deepakkhiraofficial/",
-    icon: <FaFacebook aria-hidden="true" />,
-  },
-  {
-    name: "Instagram",
-    url: "https://www.instagram.com/deepakkhiraofficial/",
-    icon: <FaInstagram aria-hidden="true" />,
-  },
+  { name: "LinkedIn", url: "https://www.linkedin.com/in/deepakkhiraofficial", icon: <FaLinkedin /> },
+  { name: "GitHub", url: "https://github.com/deepakkhiraofficial", icon: <FaGithub /> },
+  { name: "Facebook", url: "https://www.facebook.com/deepakkhiraofficial/", icon: <FaFacebook /> },
+  { name: "Instagram", url: "https://www.instagram.com/deepakkhiraofficial/", icon: <FaInstagram /> },
 ];
 
 const Contact = () => {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [loading, setLoading] = useState(false);
+  const [messages, setMessages] = useState([]); // Live messages
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -66,28 +51,23 @@ const Contact = () => {
       const res = await axios.post(
         "https://deepakkhiraofficial.onrender.com/api/contact",
         { name, email, message },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          timeout: 30000,
-        }
+        { headers: { "Content-Type": "application/json" }, timeout: 3000 }
       );
 
-      console.log("✅ Contact Response:", res.data);
-      toast.success(res?.data?.message || "Message sent successfully!", {
-        autoClose: 3000,
-      });
+      toast.success(res?.data?.message || "Message sent successfully!", { autoClose: 3000 });
 
-      // Reset form after 1 sec for smoother UX
-      setTimeout(() => {
-        setFormData({ name: "", email: "", message: "" });
-      }, 1000);
+      // Add message to live messages
+      setMessages((prev) => [
+        { name, email, message, time: new Date().toLocaleString() },
+        ...prev,
+      ]);
+
+      // Reset form
+      setFormData({ name: "", email: "", message: "" });
     } catch (error) {
-      console.error("❌ Contact form error:", error);
+      console.error(error);
       const errorMessage =
-        error?.response?.data?.error ||
-        "Failed to send message. Please try again later.";
+        error?.response?.data?.error || "Failed to send message. Please try again later.";
       toast.error(errorMessage, { autoClose: 4000 });
     } finally {
       setLoading(false);
@@ -101,39 +81,28 @@ const Contact = () => {
           Get In Touch
         </h2>
 
-        {/* Contact Info */}
+        {/* Contact Info + Social Links */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           <aside className="bg-white p-8 rounded-xl shadow-md">
-            <h3 className="text-2xl font-semibold text-blue-600 mb-6">
-              Contact Details
-            </h3>
+            <h3 className="text-2xl font-semibold text-blue-600 mb-6">Contact Details</h3>
             <ul className="space-y-4">
               <li className="flex items-center gap-4">
                 <FaEnvelope className="text-blue-500 text-xl" />
-                <a
-                  href="mailto:deepakkushwah475110@gmail.com"
-                  className="text-gray-700 hover:text-blue-600 transition"
-                >
+                <a href="mailto:deepakkushwah475110@gmail.com" className="text-gray-700 hover:text-blue-600">
                   deepakkushwah475110@gmail.com
                 </a>
               </li>
               <li className="flex items-center gap-4">
                 <FaPhoneAlt className="text-blue-500 text-xl" />
-                <a
-                  href="tel:+919109001109"
-                  className="text-gray-700 hover:text-blue-600 transition"
-                >
+                <a href="tel:+919109001109" className="text-gray-700 hover:text-blue-600">
                   +91 9109001109
                 </a>
               </li>
             </ul>
           </aside>
 
-          {/* Social Links */}
           <aside className="bg-white p-8 rounded-xl shadow-md">
-            <h3 className="text-2xl font-semibold text-blue-600 mb-6">
-              Connect With Me
-            </h3>
+            <h3 className="text-2xl font-semibold text-blue-600 mb-6">Connect With Me</h3>
             <ul className="flex flex-wrap gap-4">
               {socialLinks.map(({ name, url, icon }) => (
                 <li key={name}>
@@ -153,17 +122,13 @@ const Contact = () => {
         </div>
 
         {/* Contact Form */}
-        <div className="bg-white p-8 rounded-xl shadow-md max-w-3xl mx-auto">
-          <ToastContainer autoClose={3000} />
-          <h3 className="text-2xl font-semibold text-blue-600 mb-6">
-            Send Me a Message
-          </h3>
+        <div className="bg-white p-8 rounded-xl shadow-md max-w-3xl mx-auto mb-12">
+          <ToastContainer autoClose={3000} position="top-right" />
+          <h3 className="text-2xl font-semibold text-blue-600 mb-6">Send Me a Message</h3>
 
           <form onSubmit={handleSubmit} className="space-y-6" noValidate>
             <div>
-              <label htmlFor="name" className="block text-gray-700 mb-2 font-medium">
-                Name
-              </label>
+              <label htmlFor="name" className="block text-gray-700 mb-2 font-medium">Name</label>
               <input
                 type="text"
                 id="name"
@@ -176,9 +141,7 @@ const Contact = () => {
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-gray-700 mb-2 font-medium">
-                Email
-              </label>
+              <label htmlFor="email" className="block text-gray-700 mb-2 font-medium">Email</label>
               <input
                 type="email"
                 id="email"
@@ -191,9 +154,7 @@ const Contact = () => {
             </div>
 
             <div>
-              <label htmlFor="message" className="block text-gray-700 mb-2 font-medium">
-                Message
-              </label>
+              <label htmlFor="message" className="block text-gray-700 mb-2 font-medium">Message</label>
               <textarea
                 id="message"
                 rows="4"
@@ -209,14 +170,28 @@ const Contact = () => {
               type="submit"
               disabled={loading}
               className={`w-full py-3 rounded-lg text-white font-semibold transition ${loading
-                  ? "bg-blue-400 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700"
+                ? "bg-blue-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
                 }`}
             >
               {loading ? "Sending..." : "Send Message"}
             </button>
           </form>
         </div>
+
+        {/* Live Messages */}
+        {messages.length > 0 && (
+          <div className="max-w-3xl mx-auto space-y-4">
+            <h3 className="text-2xl font-semibold text-blue-600 mb-4">Recent Messages</h3>
+            {messages.map((msg, index) => (
+              <div key={index} className="bg-white p-4 rounded-xl shadow-md border-l-4 border-blue-500">
+                <p className="text-gray-800"><strong>{msg.name}</strong> (<a href={`mailto:${msg.email}`} className="text-blue-500">{msg.email}</a>)</p>
+                <p className="text-gray-700 mt-1">{msg.message}</p>
+                <p className="text-gray-500 text-sm mt-1">{msg.time}</p>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

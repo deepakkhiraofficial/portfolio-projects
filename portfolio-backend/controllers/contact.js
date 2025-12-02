@@ -1,6 +1,8 @@
+import Contact from "../models/Contact.js";
 import nodemailer from "nodemailer";
 import { EMAIL_USER, EMAIL_PASS } from "../config/config.js";
 
+// Send email helper
 const sendEmail = async ({ name, email, message }) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -18,33 +20,39 @@ const sendEmail = async ({ name, email, message }) => {
   await transporter.sendMail(mailOptions);
 };
 
-// const contact = async (req, res) => {
-//   const { name, email, message } = req.body;
-
-//   if (!name || !email || !message)
-//     return res.status(400).json({ error: "All fields are required" });
-
-//   res.status(200).json({ message: "Message received!" });
-
-//   sendEmail({ name, email, message }).catch((err) => {
-//     console.error("Email send failed:", err.message);
-//   });
-// };
-
-const contact = async (req, res) => {
+// POST /api/contact
+export const createContact = async (req, res) => {
   const { name, email, message } = req.body;
 
-  if (!name || !email || !message)
+  if (!name || !email || !message) {
     return res.status(400).json({ error: "All fields are required" });
+  }
 
   try {
-    await sendEmail({ name, email, message }); // ✅ wait here
-    res.status(200).json({ message: "Message received and email sent!" });
+    // Save to DB
+    const newContact = await Contact.create({ name, email, message });
+
+    // Send email
+    await sendEmail({ name, email, message });
+
+    res.status(201).json({
+      message: "Message received and email sent!",
+      contact: newContact,
+    });
   } catch (err) {
-    console.error("Email send failed:", err.message);
-    res.status(500).json({ error: "Email failed to send" });
+    console.error("Contact error:", err);
+    res.status(500).json({ error: "Failed to save/send message" });
   }
 };
 
-
-export default contact; // ✅ important
+// GET /api/contact - fetch all messages
+export const getContacts = async (req, res) => {
+  try {
+    const contacts = await Contact.find().sort({ createdAt: -1 });
+    res.status(200).json({ contacts });
+  } catch (err) {
+    console.error("Fetch contacts error:", err);
+    res.status(500).json({ error: "Failed to fetch messages" });
+  }
+};
+export default { createContact, getContacts };
