@@ -1,7 +1,3 @@
-// server.js
-// Production-ready Express + Mongo server bootstrap
-// - Use ES modules (node >= 14+ with "type": "module" in package.json)
-// - Add your route files (auth, materials) in ./routes/*.js
 
 import "express-async-errors"; // captures async errors automatically
 import dotenv from "dotenv";
@@ -21,6 +17,7 @@ import winston from "winston";
 // Route imports (adjust filenames as needed)
 import authRoutes from "./routes/auth.js";
 import studyMaterialRoutes from "./routes/studyMaterialRoutes.js";
+import contactRoutes from "./routes/contactRoutes.js";
 
 // -------------------- Setup helpers --------------------
 const __filename = fileURLToPath(import.meta.url);
@@ -45,8 +42,6 @@ const logger = winston.createLogger({
         })
       ),
     }),
-    // Optionally add file transport for production
-    // new winston.transports.File({ filename: 'logs/server.log' })
   ],
 });
 
@@ -115,6 +110,8 @@ app.get("/api/ready", (req, res) =>
 // API routes
 app.use("/api/auth", authRoutes); // auth route file -> handles /login etc
 app.use("/api/materials", studyMaterialRoutes); // study materials CRUD
+app.use("/api/contact", contactRoutes); // contact form route
+
 
 // Expose `uploads/` if you use local storing for small files
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));

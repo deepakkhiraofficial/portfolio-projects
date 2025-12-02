@@ -3,7 +3,7 @@ import {createContact,getContacts} from "../controllers/contact.js";
 
 const router = express.Router();
 
-router.post("/contact", createContact);
-router.get("/contact", getContacts);
+router.post("/", createContact);
+router.get("/", getContacts);
 
 export default router;
