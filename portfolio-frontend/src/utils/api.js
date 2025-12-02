@@ -1,6 +1,6 @@
 // const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3500";
 const API_BASE = (
-  import.meta.env.VITE_API_URL ?? "http://localhost:3500"
+  import.meta.env.VITE_API_URL ?? "https://deepakkhiraofficial.netlify.app/"
 ).replace(/\/$/, "");
 
 async function request(path, options = {}) {
