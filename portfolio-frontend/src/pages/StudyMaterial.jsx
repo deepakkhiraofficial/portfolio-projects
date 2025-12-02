@@ -1,4 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getMaterials, createMaterial, updateMaterial, deleteMaterial } from "../utils/api.js";
 
 const STORAGE_KEY = "dk_portfolio_materials_v1";
 
@@ -11,209 +14,120 @@ function useLocalStorageState(key, initial) {
         try {
             const raw = localStorage.getItem(key);
             return raw ? JSON.parse(raw) : initial;
-        } catch (e) {
-            console.error(e);
+        } catch {
             return initial;
         }
     });
 
-    useEffect(() => {
+    React.useEffect(() => {
         try {
             localStorage.setItem(key, JSON.stringify(state));
-        } catch (e) {
-            console.error(e);
-        }
+        } catch { }
     }, [key, state]);
 
     return [state, setState];
 }
 
+/* ----------------- Header ----------------- */
 function Header({ onOpenAdd, activeTab, setActiveTab }) {
     return (
-        <header className="bg-white/80 backdrop-blur-sm sticky top-0 z-40 border-b border-gray-200">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 flex items-center justify-between h-16">
-                <div className="flex items-center gap-4">
-                    <div className="text-2xl font-extrabold tracking-tight text-slate-900">Deepak's Library</div>
-                    <nav className="hidden sm:flex gap-2">
-                        <button
-                            onClick={() => setActiveTab("home")}
-                            className={`px-3 py-2 rounded-md text-sm font-medium ${activeTab === "home" ? "bg-slate-100" : "hover:bg-slate-50"}`}>
-                            Home
-                        </button>
-                        <button
-                            onClick={() => setActiveTab("materials")}
-                            className={`px-3 py-2 rounded-md text-sm font-medium ${activeTab === "materials" ? "bg-slate-100" : "hover:bg-slate-50"}`}>
-                            Materials
-                        </button>
-                    </nav>
-                </div>
-
-                <div className="flex items-center gap-3">
+        <header className="bg-white shadow sticky top-0 z-40">
+            <div className="max-w-6xl mx-auto px-4 flex justify-between h-16 items-center">
+                <div className="font-bold text-2xl">Deepak's Library</div>
+                <nav className="flex gap-3">
+                    <button
+                        onClick={() => setActiveTab("home")}
+                        className={`px-3 py-2 rounded-md ${activeTab === "home" ? "bg-indigo-100" : "hover:bg-gray-100"}`}
+                    >
+                        Home
+                    </button>
                     <button
                         onClick={() => setActiveTab("materials")}
-                        className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-md bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700">
-                        Browse Materials
+                        className={`px-3 py-2 rounded-md ${activeTab === "materials" ? "bg-indigo-100" : "hover:bg-gray-100"}`}
+                    >
+                        Materials
                     </button>
-                    <button
-                        onClick={onOpenAdd}
-                        className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-indigo-600 text-indigo-600 text-sm font-medium hover:bg-indigo-50">
-                        + Add Material
-                    </button>
-                </div>
+                </nav>
+                <button
+                    onClick={onOpenAdd}
+                    className="px-3 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-700"
+                >
+                    + Add Material
+                </button>
             </div>
         </header>
     );
 }
 
+/* ----------------- Hero ----------------- */
 function Hero({ setActiveTab }) {
     return (
-        <section className="bg-gradient-to-r from-indigo-50 to-sky-50 py-12">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 grid gap-8 lg:grid-cols-2 items-center">
+        <section className="bg-indigo-50 py-12">
+            <div className="max-w-5xl mx-auto px-4 grid lg:grid-cols-2 gap-6 items-center">
                 <div>
-                    <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900">Organize & Share Your Study Materials</h1>
-                    <p className="mt-4 text-slate-700 max-w-xl">
-                        Create subject-wise study materials, attach files or links, and share them instantly. Mobile-friendly,
-                        SEO-ready layout and fast performance for learners and peers.
-                    </p>
-
-                    <div className="mt-6 flex gap-3">
-                        <button
-                            onClick={() => setActiveTab("materials")}
-                            className="px-4 py-2 rounded-md bg-indigo-600 text-white font-medium hover:bg-indigo-700">
-                            Browse Materials
-                        </button>
-                        <a href="mailto:example@email.com" className="px-4 py-2 rounded-md border border-slate-200 text-sm text-slate-700 hover:bg-slate-50">
-                            Quick Contact
-                        </a>
-                    </div>
-
-                    <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
-                        <li>• Add subject, title, description, file or external link</li>
-                        <li>• Fast search & filters</li>
-                        <li>• Share via generated link</li>
-                        <li>• Files stored in browser for quick demos (use a backend for production)</li>
-                    </ul>
+                    <h1 className="text-4xl font-bold text-gray-900">Organize & Share Your Study Materials</h1>
+                    <p className="mt-4 text-gray-700">Create subject-wise notes, attach files or links, and share them easily.</p>
+                    <button
+                        onClick={() => setActiveTab("materials")}
+                        className="mt-6 px-4 py-2 bg-indigo-600 text-white rounded"
+                    >
+                        Browse Materials
+                    </button>
                 </div>
-
-                <div className="bg-white p-6 rounded-2xl shadow-md">
-                    <img src="/study.jpg" alt="study" className="w-full h-56 object-cover rounded-lg" />
+                <div>
+                    <img src="/study.jpg" className="rounded-lg shadow-lg w-full h-56 object-cover" alt="study" />
                 </div>
             </div>
         </section>
     );
 }
 
-import { motion } from "framer-motion";
-
+/* ----------------- Material Card ----------------- */
 function MaterialCard({ m, onEdit, onDelete, onShare }) {
     return (
-        <motion.article
+        <motion.div
+            layout
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
             whileHover={{ scale: 1.02 }}
-            transition={{ duration: 0.25 }}
-            className="bg-white border border-gray-200 rounded-2xl p-6 shadow-lg hover:shadow-2xl flex flex-col justify-between max-w-md mx-auto"
+            transition={{ duration: 0.2 }}
+            className="bg-white p-5 rounded-xl shadow-md border flex flex-col justify-between"
         >
-            {/* Top Section */}
             <div>
-                <div className="flex items-start justify-between gap-3">
-
-                    {/* Title & Subject */}
-                    <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900 leading-tight">
-                            {m.title}
-                        </h3>
-                        <p className="text-xs text-gray-500 mt-1">
-                            {m.subject} • {new Date(m.createdAt).toLocaleDateString()}
-                        </p>
-                    </div>
-
-                    {/* Tags */}
-                    <div className="flex flex-wrap gap-2 justify-end">
-                        {m.tags?.slice(0, 3).map((t, i) => (
-                            <span
-                                key={i}
-                                className="px-3 py-1 text-[11px] font-medium
-                             bg-indigo-100 text-indigo-800 rounded-full
-                             hover:bg-indigo-200 transition"
-                            >
-                                {t}
-                            </span>
-                        ))}
-                    </div>
+                <h3 className="font-semibold text-lg">{m.title}</h3>
+                <p className="text-sm text-gray-500 mt-1">{m.subject}</p>
+                <p className="mt-3 text-gray-700 text-sm">{m.description}</p>
+                <div className="flex flex-wrap gap-2 mt-3">
+                    {m.tags?.slice(0, 3).map((t, i) => (
+                        <span key={i} className="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs">{t}</span>
+                    ))}
                 </div>
-
-                {/* Description */}
-                <p className="mt-4 text-gray-700 text-sm line-clamp-4 leading-relaxed">
-                    {m.description}
-                </p>
             </div>
 
-            {/* Bottom Section */}
-            <div className="mt-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-
-                {/* File / Link Section */}
-                <div className="flex items-center gap-3 text-sm font-medium flex-wrap">
+            <div className="flex justify-between items-center mt-4 text-sm">
+                <div className="flex gap-2">
                     {m.fileDataUrl && (
-                        <a
-                            download={m.fileName || `material_${m.id}.bin`}
-                            href={m.fileDataUrl}
-                            className="underline text-indigo-600 hover:text-indigo-800 transition"
-                        >
-                            Download
-                        </a>
+                        <a download={m.fileName} href={m.fileDataUrl} className="underline text-indigo-600">Download</a>
                     )}
                     {m.externalLink && (
-                        <a
-                            target="_blank"
-                            rel="noreferrer"
-                            href={m.externalLink}
-                            className="underline text-indigo-600 hover:text-indigo-800 transition"
-                        >
-                            Open Link
-                        </a>
+                        <a target="_blank" rel="noreferrer" href={m.externalLink} className="underline text-indigo-600">Open Link</a>
                     )}
                 </div>
 
-                {/* Buttons Section */}
-                <div className="flex items-center gap-2 flex-wrap">
-                    <button
-                        onClick={() => onShare(m)}
-                        className="px-3 py-1.5 text-xs rounded-md border border-gray-300 bg-white hover:bg-gray-100 transition font-medium"
-                    >
-                        Share
-                    </button>
-
-                    <button
-                        onClick={() => {
-                            const key = prompt("Enter Admin Key (Edit):");
-                            if (key === "9109") onEdit(m);
-                            else if (key !== null) alert("Invalid Key!");
-                        }}
-                        className="px-3 py-1.5 text-xs rounded-md bg-yellow-100 text-yellow-800 hover:bg-yellow-200 transition font-medium"
-                    >
-                        Edit
-                    </button>
-
-                    <button
-                        onClick={() => {
-                            const key = prompt("Enter Admin Key (Delete):");
-                            if (key === "9109") onDelete(m.id);
-                            else if (key !== null) alert("Invalid Key!");
-                        }}
-                        className="px-3 py-1.5 text-xs rounded-md bg-red-100 text-red-800 hover:bg-red-200 transition font-medium"
-                    >
-                        Delete
-                    </button>
+                <div className="flex gap-2">
+                    <button onClick={() => onShare(m)} className="px-2 py-1 border rounded text-xs hover:bg-gray-100">🔗 Share</button>
+                    <button onClick={() => onEdit(m)} className="px-2 py-1 bg-yellow-200 text-yellow-800 rounded text-xs hover:bg-yellow-300">✏️ Edit</button>
+                    <button onClick={() => onDelete(m.id)} className="px-2 py-1 bg-red-200 text-red-800 rounded text-xs hover:bg-red-300">🗑️ Delete</button>
                 </div>
             </div>
-        </motion.article>
+        </motion.div>
     );
-  }
+}
 
-
+/* ----------------- Add/Edit Modal ----------------- */
 function AddEditModal({ open, onClose, initial, onSave }) {
-    const [form, setForm] = useState(() => initial || {
+    const [form, setForm] = useState({
         subject: "",
         title: "",
         description: "",
@@ -223,212 +137,192 @@ function AddEditModal({ open, onClose, initial, onSave }) {
         fileDataUrl: null,
     });
 
-    useEffect(() => setForm(initial || { subject: "", title: "", description: "", tags: "", externalLink: "", fileName: "", fileDataUrl: null }), [initial]);
+    React.useEffect(() => {
+        if (initial) {
+            setForm({
+                ...initial,
+                // If tags is an array, convert to comma-separated string
+                tags: Array.isArray(initial.tags) ? initial.tags.join(", ") : initial.tags || "",
+            });
+        } else {
+            setForm({
+                subject: "",
+                title: "",
+                description: "",
+                tags: "",
+                externalLink: "",
+                fileName: "",
+                fileDataUrl: null,
+            });
+        }
+    }, [initial]);
 
     function handleFile(e) {
         const f = e.target.files?.[0];
         if (!f) return;
         const reader = new FileReader();
-        reader.onload = () => {
-            setForm(prev => ({ ...prev, fileDataUrl: reader.result, fileName: f.name }));
-        };
+        reader.onload = () => setForm(p => ({ ...p, fileDataUrl: reader.result, fileName: f.name }));
         reader.readAsDataURL(f);
     }
 
-    function submit(e) {
+    const submit = e => {
         e.preventDefault();
-        const payload = {
+        onSave({
             ...form,
-            tags: form.tags ? form.tags.split(",").map(t => t.trim()).filter(Boolean) : [],
-        };
-        onSave(payload);
-    }
+            // Convert tags string to array safely
+            tags: typeof form.tags === "string"
+                ? form.tags.split(",").map(t => t.trim()).filter(Boolean)
+                : form.tags,
+        });
+    };
 
     if (!open) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-            <form onSubmit={submit} className="bg-white max-w-2xl w-full rounded-lg p-6 shadow-lg">
-                <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-semibold">{initial ? "Edit Material" : "Add Material"}</h2>
-                    <button type="button" onClick={onClose} className="text-slate-500">Close</button>
-                </div>
+        <div className="fixed inset-0 bg-black/40 flex justify-center items-center p-5 z-40">
+            <form onSubmit={submit} className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
+                <h2 className="font-semibold mb-4">{initial ? "Edit Material" : "Add Material"}</h2>
 
-                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <label className="flex flex-col">
-                        <span className="text-sm text-slate-600">Subject</span>
-                        <input required value={form.subject} onChange={e => setForm({ ...form, subject: e.target.value })} className="mt-1 p-2 border rounded" />
-                    </label>
+                <input required placeholder="Subject" value={form.subject} onChange={e => setForm({ ...form, subject: e.target.value })} className="border p-2 rounded w-full mb-3" />
+                <input required placeholder="Title" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} className="border p-2 rounded w-full mb-3" />
+                <textarea required placeholder="Description" rows={3} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} className="border p-2 rounded w-full mb-3" />
+                <input placeholder="Tags (comma separated)" value={form.tags} onChange={e => setForm({ ...form, tags: e.target.value })} className="border p-2 rounded w-full mb-3" />
+                <input placeholder="External Link" value={form.externalLink} onChange={e => setForm({ ...form, externalLink: e.target.value })} className="border p-2 rounded w-full mb-3" />
 
-                    <label className="flex flex-col">
-                        <span className="text-sm text-slate-600">Title</span>
-                        <input required value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} className="mt-1 p-2 border rounded" />
-                    </label>
-                </div>
+                <label className="block text-sm text-gray-600 mb-2">Attach small file (optional)</label>
+                <input type="file" onChange={handleFile} className="mb-4" />
+                {form.fileName && <div className="text-xs text-gray-500 mb-3">Attached: {form.fileName}</div>}
 
-                <label className="flex flex-col mt-3">
-                    <span className="text-sm text-slate-600">Description</span>
-                    <textarea required value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={4} className="mt-1 p-2 border rounded" />
-                </label>
-
-                <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <label className="flex flex-col">
-                        <span className="text-sm text-slate-600">Tags (comma separated)</span>
-                        <input value={form.tags} onChange={e => setForm({ ...form, tags: e.target.value })} className="mt-1 p-2 border rounded" />
-                    </label>
-
-                    <label className="flex flex-col">
-                        <span className="text-sm text-slate-600">External Link</span>
-                        <input value={form.externalLink} onChange={e => setForm({ ...form, externalLink: e.target.value })} className="mt-1 p-2 border rounded" />
-                    </label>
-
-                    <label className="flex flex-col">
-                        <span className="text-sm text-slate-600">Attach File</span>
-                        <input type="file" onChange={handleFile} className="mt-1" />
-                        {form.fileName && <span className="text-xs mt-1 text-slate-500">Attached: {form.fileName}</span>}
-                    </label>
-                </div>
-
-                <div className="mt-6 flex items-center justify-end gap-2">
-                    <button type="button" onClick={onClose} className="px-3 py-2 rounded border">Cancel</button>
-                    <button type="submit" className="px-3 py-2 rounded bg-indigo-600 text-white">Save</button>
+                <div className="flex justify-end gap-2">
+                    <button onClick={onClose} type="button" className="border px-3 py-2 rounded">Cancel</button>
+                    <button type="submit" className="bg-indigo-600 text-white px-3 py-2 rounded">Save</button>
                 </div>
             </form>
         </div>
     );
 }
+  
 
+/* ----------------- Main App ----------------- */
 export default function App() {
-    const [materials, setMaterials] = useLocalStorageState(STORAGE_KEY, []);
+    const [localMaterials, setLocalMaterials] = useLocalStorageState(STORAGE_KEY, []);
     const [openAdd, setOpenAdd] = useState(false);
     const [editing, setEditing] = useState(null);
     const [query, setQuery] = useState("");
-    const [subjectFilter, setSubjectFilter] = useState("");
     const [activeTab, setActiveTab] = useState("home");
 
-    useEffect(() => {
-        // If the page was loaded with a share link (e.g. ?share=<id>), open the item quickly
-        const params = new URLSearchParams(window.location.search);
-        const shareId = params.get("share");
-        if (shareId) {
-            const found = materials.find(m => m.id === shareId);
-            if (found) {
-                setActiveTab("materials");
-                setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 200);
-            }
-        }
-    }, [materials]);
+    const queryClient = useQueryClient();
 
-    function handleSave(payload) {
-        if (editing) {
-            setMaterials(prev => prev.map(p => p.id === editing.id ? { ...p, ...payload } : p));
-            setEditing(null);
-        } else {
-            const item = { id: uid(), ...payload, createdAt: Date.now() };
-            setMaterials(prev => [item, ...prev]);
-        }
-        setOpenAdd(false);
-    }
+    // ----------------- Fetch materials -----------------
+    const { data: materials = [], isLoading, isError } = useQuery({
+        queryKey: ["materials"],
+        queryFn: async () => {
+            const res = await getMaterials();
+            const list = (res?.data ?? res ?? []).map(m => ({ ...m, id: m.id || m._id }));
+            // Save to localStorage as fallback
+            setLocalMaterials(list);
+            return list;
+        },
+        staleTime: 5 * 60 * 1000,
+        refetchOnWindowFocus: false,
+    });
 
-    function handleEdit(m) {
-        setEditing(m);
-        setOpenAdd(true);
-    }
+    // ----------------- Mutations -----------------
+    const saveMutation = useMutation({
+        mutationFn: async ({ id, payload }) =>
+            id ? await updateMaterial(id, payload) : await createMaterial(payload),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["materials"] }),
+    });
 
-    function handleDelete(id) {
-        if (!confirm("Delete this material?")) return;
-        setMaterials(prev => prev.filter(p => p.id !== id));
-    }
+    const deleteMutation = useMutation({
+        mutationFn: async (id) => await deleteMaterial(id),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["materials"] }),
+    });
 
-    function handleShare(m) {
-        // Create a shareable URL with query param (works on same site)
-        const url = new URL(window.location.href);
-        url.searchParams.set("share", m.id);
-        navigator.clipboard?.writeText(url.toString()).then(() => {
-            alert("Share link copied to clipboard!");
-        }).catch(() => {
-            prompt("Copy this share link:", url.toString());
-        });
-    }
-
-    const subjects = Array.from(new Set(materials.map(m => m.subject))).filter(Boolean);
-
+    // ----------------- Filtered list -----------------
     const filtered = materials.filter(m => {
         const q = query.trim().toLowerCase();
-        if (subjectFilter && m.subject !== subjectFilter) return false;
         if (!q) return true;
         return [m.title, m.subject, m.description, (m.tags || []).join(" ")].join(" ").toLowerCase().includes(q);
     });
 
-    return (
-        <div className="min-h-screen bg-slate-50 text-slate-900">
-            <Header onOpenAdd={() => { setEditing(null); setOpenAdd(true); }} activeTab={activeTab} setActiveTab={setActiveTab} />
+    // ----------------- Handlers -----------------
+    const handleSave = async (payload) => {
+        try {
+            await saveMutation.mutateAsync({ id: editing?.id, payload });
+            setEditing(null);
+            setOpenAdd(false);
+        } catch (err) {
+            alert("Operation failed. Try again.");
+            console.error(err);
+        }
+    };
 
-            <main className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-8">
+    const handleDelete = async (id) => {
+        if (!confirm("Delete this material?")) return;
+        try {
+            await deleteMutation.mutateAsync(id);
+        } catch {
+            alert("Delete failed");
+        }
+    };
+
+    const handleShare = async (m) => {
+        const url = new URL(window.location.href);
+        url.searchParams.set("share", m.id);
+        try {
+            await navigator.clipboard.writeText(url.toString());
+            alert("Share link copied!");
+        } catch {
+            prompt("Copy this link:", url.toString());
+        }
+    };
+
+    return (
+        <div className="min-h-screen bg-gray-50">
+            <Header
+                onOpenAdd={() => { setEditing(null); setOpenAdd(true); }}
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+            />
+
+            <main className="max-w-6xl mx-auto p-6">
                 {activeTab === "home" && <Hero setActiveTab={setActiveTab} />}
 
-                <section className={`mt-8 ${activeTab === "materials" ? "block" : "hidden"}`}>
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                        <div className="flex items-center gap-3 w-full sm:w-auto">
-                            <input placeholder="Search materials, titles, tags..." value={query} onChange={e => setQuery(e.target.value)} className="w-full sm:w-96 p-2 border rounded" />
-                            <select value={subjectFilter} onChange={e => setSubjectFilter(e.target.value)} className="p-2 border rounded">
-                                <option value="">All subjects</option>
-                                {subjects.map((s, i) => <option key={i} value={s}>{s}</option>)}
-                            </select>
+                {activeTab === "materials" && (
+                    <>
+                        <input
+                            placeholder="Search..."
+                            value={query}
+                            onChange={e => setQuery(e.target.value)}
+                            className="border p-2 rounded w-full mb-4"
+                        />
+
+                        {isLoading && <div className="text-center text-sm text-gray-600">Loading...</div>}
+                        {isError && <div className="text-sm text-yellow-700">Could not fetch from server — using local cache.</div>}
+
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+                            {filtered.length === 0 && !isLoading && (
+                                <div className="col-span-full text-center py-12 text-slate-500">
+                                    No materials yet — add one using the Add button.
+                                </div>
+                            )}
+
+                            <AnimatePresence>
+                                {filtered.map(m => (
+                                    <MaterialCard
+                                        key={m.id}
+                                        m={m}
+                                        onEdit={x => { setEditing(x); setOpenAdd(true); }}
+                                        onDelete={handleDelete}
+                                        onShare={handleShare}
+                                    />
+                                ))}
+                            </AnimatePresence>
                         </div>
-
-                        <div className="flex items-center gap-3">
-                            <button onClick={() => { setEditing(null); setOpenAdd(true); }} className="px-3 py-2 rounded bg-indigo-600 text-white">+ Add</button>
-                            <button onClick={() => { setMaterials([]); }} className="px-3 py-2 rounded border">Clear All</button>
-                        </div>
-                    </div>
-
-                    <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {filtered.length === 0 && (
-                            <div className="col-span-full text-center py-12 text-slate-500">No materials yet — add one using the Add button.</div>
-                        )}
-
-                        {filtered.map(m => (
-                            <MaterialCard key={m.id} m={m} onEdit={handleEdit} onDelete={handleDelete} onShare={handleShare} />
-                        ))}
-                    </div>
-                </section>
-
-                <section className="mt-12">
-                    <h2 className="text-xl font-semibold">About this site</h2>
-                    <p className="mt-3 text-slate-700">This is a simple, client-side-first portfolio & materials manager. For production usage: move files to a backend (S3), add authentication, and server-side rendering to improve SEO and sharing previews.</p>
-
-                    <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="bg-white p-4 rounded-lg border">
-                            <h3 className="font-semibold">SEO tips</h3>
-                            <ul className="mt-2 text-sm text-slate-700">
-                                <li>• Add meta tags & structured data (JSON-LD) via react-helmet or server-side templates.</li>
-                                <li>• Use server-side rendering (Next.js) for crawling and link previews.</li>
-                                <li>• Use descriptive file names and alt text for images.</li>
-                            </ul>
-                        </div>
-
-                        <div className="bg-white p-4 rounded-lg border">
-                            <h3 className="font-semibold">Next steps</h3>
-                            <ul className="mt-2 text-sm text-slate-700">
-                                <li>• Add backend + authentication for private / public materials.</li>
-                                <li>• Add categories, comments, and download analytics.</li>
-                                <li>• Add proper shareable preview images (Open Graph / Twitter cards).</li>
-                            </ul>
-                        </div>
-                    </div>
-                </section>
+                    </>
+                )}
             </main>
-
-            <footer className="border-t border-slate-200 mt-12 bg-white/60">
-                <div className="max-w-6xl mx-auto px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-                    <div className="text-sm text-slate-600">© {new Date().getFullYear()} Deepak Kushwah — Portfolio & Study Materials</div>
-                    <div className="flex items-center gap-3">
-                        <a href="#" className="text-sm underline">Privacy</a>
-                        <a href="#" className="text-sm underline">Terms</a>
-                    </div>
-                </div>
-            </footer>
 
             <AddEditModal
                 open={openAdd}
